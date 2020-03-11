@@ -1,0 +1,40 @@
+#include "mbed.h"
+#include "MMA8451Q.h"
+#include "USBMouse.h"
+#include "TSISensor.h"
+
+//#define MMA8451_I2C_ADDRESS(0X1d<<1)
+
+USBMouse mouse;
+MMA8451Q acc(PTE25, PTE24,0X1d<<1 );
+TSISensor tsi;
+
+
+int main() {
+    float x,y,t;
+    
+    while(1){
+        //accquire acc values and move cursor
+        x=acc.getAccX()*10;
+        y=acc.getAccY()*10;
+        mouse.move(-y,x);
+        
+        //accquire tsi value and click
+         
+         t=tsi.readPercentage();
+         if(t>0.6)
+         {
+             mouse.press(MOUSE_LEFT);
+         }
+        else if((t<0.4)&&(t!=0))  
+        {
+          mouse.press(MOUSE_RIGHT);
+        }
+        else 
+        {
+          mouse.release(MOUSE_LEFT);
+          mouse.release(MOUSE_RIGHT);
+        }
+        wait(0.01);    
+         }
+}
